@@ -30,6 +30,10 @@ DICTOWNERS = {
     ]
 }
 
+TRACKING_DEVICES = set()
+UNTRACKING_DEVICES = set()
+#содержат адреса устройств
+
 class Device_bracelet:
     def __init__(self, name, address):
         self.name = name
@@ -37,13 +41,21 @@ class Device_bracelet:
         self.heartRate = 0
         self._client = None
         self.status = False
-        
+    
+    def on_disconnect(self, client: BleakClient):
+            self.status = False
+            print(f"Disconnected: {self.name}")
+            TRACKING_DEVICES.discard(self.address)
+            UNTRACKING_DEVICES.add(self.address)
+            #получаем данные что устрйство отключено
+
     async def connect(self):
-        self._client = BleakClient(self.address)
+        self._client = BleakClient(self.address, disconnected_callback=self.on_disconnect)
         await self._client.connect()
 
         def callback(sender, data):
             self._update_heart_rate(data)
+            TRACKING_DEVICES.add(self.address)
         
         await self._client.start_notify(
             HEART_RATE_MEASUREMENT_UUID,
@@ -66,7 +78,6 @@ for key in DICTOWNERS:
 
     
 async def scan_devices():
-    #print(DICTOWNERS["1"])
     async with print_lock:
         print("\nScanning for devices...", end="\r")
     devices = await BleakScanner.discover()    
@@ -81,28 +92,11 @@ async def scan_devices():
 async def continuous_scan(interval=5):
     while True:
         try:
-            found_devices = await BleakScanner.discover()
-            new_devices = []
-            
+            found_devices = await BleakScanner.discover()            
             for device in found_devices:
                 if device.name and device.name.startswith("H1_"):
-                    exists = any(
-                        DICTOWNERS[key][1] and 
-                        DICTOWNERS[key][1].name == device.name 
-                        for key in DICTOWNERS
-                    )
-                    if not exists:
-                        new_devices.append(device)
-
-            async with print_lock:
-                if new_devices:
-                    print("\n" + "="*50)
-                    print("Found NEW devices not in DICTOWNERS:")
-                    for device in new_devices:
-                        print(f"- {device.name} ({device.address})")
-                    print("="*50)
-                else:
-                    print("\nNo new compatible devices found")
+                    if not device.address in TRACKING_DEVICES:
+                        UNTRACKING_DEVICES.add(device.address)
             
         except Exception as e:
             async with print_lock:
@@ -130,12 +124,25 @@ async def print_heart_rates():
             output = []
             output.append("\nHeart Rate Monitor:")
             output.append('%-5s | %-10s | %-20s | %-10s | %-10s' % ('Owner', 'Name', "Address", "BPM", "Status"))
-            output.append("-"*60)
+            output.append("-"*69)
             for key in DICTOWNERS:
                 if DICTOWNERS[key][1]:
                     output.append('%-5s | %-10s | %-20s | %-10s | %-10s' % 
                            (key, DICTOWNERS[key][1].name, DICTOWNERS[key][1].address, DICTOWNERS[key][1].heartRate, "Connected" if DICTOWNERS[key][1].status else "Disconnected"))
             print("\n".join(output))
+
+            print(f"{'=' * 69}")
+            print("TRACKING DEVICES:")
+            print(f"{'-' * 69}\n")
+            for d in TRACKING_DEVICES:
+                print(d)
+            
+            print(f"{'=' * 69}\n")
+            print("UNTRACKING DEVICES:")
+            print(f"{'-' * 69}\n")
+            for d in UNTRACKING_DEVICES:
+                print(d)
+            print(f"{'=' * 69}\n") 
         await asyncio.sleep(1)
 
 async def main():
