@@ -27,11 +27,16 @@ DICTOWNERS = {
     "3": [
         "H1_39415",
         None
+    ],
+    "4": [
+        "H1_41002",
+        None
     ]
 }
 
 TRACKING_DEVICES = set()
 UNTRACKING_DEVICES = set()
+#будет содержать ("H1_39415",None)
 #содержат адреса устройств
 
 class Device_bracelet:
@@ -45,8 +50,8 @@ class Device_bracelet:
     def on_disconnect(self, client: BleakClient):
             self.status = False
             print(f"Disconnected: {self.name}")
-            TRACKING_DEVICES.discard(self.address)
-            UNTRACKING_DEVICES.add(self.address)
+            TRACKING_DEVICES.discard((self.name, self))
+            UNTRACKING_DEVICES.add((self.name, self))
             #получаем данные что устрйство отключено
 
     async def connect(self):
@@ -55,7 +60,12 @@ class Device_bracelet:
 
         def callback(sender, data):
             self._update_heart_rate(data)
-            TRACKING_DEVICES.add(self.address)
+            '''if not (self.name, self) in TRACKING_DEVICES:
+                TRACKING_DEVICES.add((self.name, self))'''
+            if not any(d_name == self.name for d_name, _ in TRACKING_DEVICES):
+                TRACKING_DEVICES.add((self.name, self))
+                UNTRACKING_DEVICES.discard((self.name, self))
+
         
         await self._client.start_notify(
             HEART_RATE_MEASUREMENT_UUID,
@@ -92,17 +102,21 @@ async def scan_devices():
 async def continuous_scan(interval=5):
     while True:
         try:
-            found_devices = await BleakScanner.discover()            
-            for device in found_devices:
-                if device.name and device.name.startswith("H1_"):
-                    if not device.address in TRACKING_DEVICES:
-                        UNTRACKING_DEVICES.add(device.address)
+            found_devices = await BleakScanner.discover()
+            current_device_names = {d.name for d in found_devices if d.name and d.name.startswith("H1_")}
+            for name in current_device_names:
+                if not any(d_name == name for d_name, _ in TRACKING_DEVICES) and \
+                   not any(d_name == name for d_name, _ in UNTRACKING_DEVICES):
+                    address = next(d.address for d in found_devices if d.name == name)
+                    new_device = Device_bracelet(name, address)
+                    UNTRACKING_DEVICES.add((new_device.name, new_device))
             
         except Exception as e:
             async with print_lock:
                 print(f"Scanning error: {str(e)}")
         
         await asyncio.sleep(interval)
+
 
 async def monitor_devices():
     while True:
@@ -116,7 +130,7 @@ async def monitor_devices():
             await asyncio.gather(*tasks, return_exceptions=True) 
         
         await asyncio.sleep(1)
-    
+
 
 async def print_heart_rates():    
     while True:
