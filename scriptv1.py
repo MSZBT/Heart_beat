@@ -49,8 +49,6 @@ class DeviceBracelet:
                     self.heart_rate = int.from_bytes(data[1:3], 'little')
                 else:  # 8-bit
                     self.heart_rate = int(data[1])
-                
-                print(f"Heart rate update for {self.name}: {self.heart_rate} bpm")
             
             await self._client.start_notify(
                 HEART_RATE_MEASUREMENT_UUID,
@@ -110,7 +108,7 @@ async def monitor_devices():
             print(f"Monitoring error: {e}")
         
         await asyncio.sleep(5)
-
+'''
 async def print_status():
     while True:
         async with print_lock:
@@ -182,6 +180,30 @@ async def print_status():
             print("\n".join(output))
         
         await asyncio.sleep(1)
+
+'''
+
+async def print_status(): 
+    TRANSMIT_DATA = {
+        "1": "N/D",
+        "2": "N/D",
+        "3": "N/D",
+        "4": "N/D",
+        "5": "N/D",
+        "6": "N/D"
+    }
+    while True:
+        for key in DICTOWNERS:
+            device = DICTOWNERS[key][1]
+            if device:
+                TRANSMIT_DATA[key] = device.heart_rate
+            else:
+                TRANSMIT_DATA[key] = "N/D"
+        print("\n")
+        print(TRANSMIT_DATA)
+        print("\n")
+        await asyncio.sleep(1)
+
 async def main():
     # Initial scan
     await scan_devices()
