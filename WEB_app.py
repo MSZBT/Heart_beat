@@ -17,7 +17,6 @@ def manager():
 def update_order():
     global current_order
     current_order = request.json
-    print(current_order)
     return jsonify({"status": "success"})
 
 @app.route('/get_order')
