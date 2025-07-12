@@ -35,16 +35,20 @@ async function fetchHeartRate() {
             const text = owner.querySelector("p");
             const heart = owner.querySelector(".testHeart");
             
-            // Получаем данные пульса для этого устройства
             const heartRate = data[deviceId] || 'N/D';
 
             if (text) {
                 if (heartRate && heartRate !== "N/D" && heartRate !== "0") {
                     text.textContent = `${heartRate}`;
-                    heart.style.backgroundColor = "red";
+                    heart.style.backgroundImage = "url('/static/img/heart.png')";
+                    
+                    //let newDuration = 60 / heartRate * 1000; 
+                    //heart._animation.effect.updateTiming({ duration: newDuration });
+                    //heart._animation.play();
                 } else {
                     text.textContent = "";
-                    heart.style.backgroundColor = "grey";
+                    heart.style.backgroundImage = "url('/static/img/heart2.png')";
+                    //heart._animation.pause();
                 }
             }
         });
@@ -52,7 +56,18 @@ async function fetchHeartRate() {
         console.error("Fetch error:", error);
     }
 }
+/*
+const keyframes = [
+  { transform: 'scale(1)' },   
+  { transform: 'scale(1.1)' }   
+];
 
+let options = {
+  duration: "0.1s",
+  easing: 'ease-in-out',
+  fill: 'forwards'
+};
+*/
 document.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchHeartRate, 1000);
     fetchHeartRate();
