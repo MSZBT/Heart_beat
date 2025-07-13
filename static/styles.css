@@ -1,3 +1,14 @@
+@font-face {
+    font-family: "Roboto";
+    src: url("static/font/Roboto-Regular.ttf");
+    font-weight: normal;
+    font-style: normal;
+}
+
+p {
+    font-family: "Roboto", sans-serif !important;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -17,37 +28,28 @@ body {
 }
 
 .titrs {
-    width: 1720px;
+    width: 1600px;
     height: 28px;
     position: absolute;
-    bottom: 168px;
-    left: 147px;
+    bottom: 170px;
+    left: 90px;
+
     display: flex;
+    justify-content: space-between;
 }
 
 .ownerBlock {
     position: relative;
-    width: 284px;
+    width: 180px;
     height: 28px;
 
+    background-color: rgba(124, 124, 124, 0.32);
     display: flex;
     justify-content: space-between;
     align-items: center;
 
 }
 
-.ownerBlock::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 3px solid #C34A12;
-    transform: skewX(-30deg); 
-
-    
-}
 
 .testHeart {
     width: 18px;
@@ -56,15 +58,31 @@ body {
     background-position: center;
     background-size: 18px 18px;
 
-    margin-left: 50px;
-    margin-top: 5px;
+    margin-left: 80px;
+
+    animation-duration: 0.5s;
+    animation-name: slide-in;
+    animation-iteration-count: infinite;
 }
 
 .ownerBlock p {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 500;
-    color: rgb(0, 136, 255);
+    color: rgb(255, 255, 255);
     font-size: 20px;
-    margin-right: 100px;
-    margin-top: 5px;
+    margin-right: 40px;
+}
+
+
+@keyframes heartBeat {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }

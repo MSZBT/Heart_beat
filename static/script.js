@@ -17,12 +17,20 @@ async function fetchHeartRate() {
         
         if (JSON.stringify(oldDirrection) !== JSON.stringify(dirrection_data)) {
             titrs.innerHTML = "";
-            for (const [position, deviceId] of Object.entries(dirrection_data)) {  
-                titrs.innerHTML += `
-                <div class="ownerBlock" name="${deviceId}" data-position="${position}">
-                    <div class="testHeart"></div>
-                    <p></p>
-                </div>`;
+            for (const [position, deviceId] of Object.entries(dirrection_data)) { 
+                if (deviceId === "0") {
+                    titrs.innerHTML += `
+                    <div class="ownerBlock" name="${deviceId}" data-position="${position}" style="opacity: 0">
+                        <div class="testHeart"></div>
+                        <p></p>
+                    </div>`;
+                } else {                
+                    titrs.innerHTML += `
+                    <div class="ownerBlock" name="${deviceId}" data-position="${position}">
+                        <div class="testHeart"></div>
+                        <p></p>
+                    </div>`;
+                }
             }
             oldDirrection = {...dirrection_data};
         }
@@ -41,14 +49,13 @@ async function fetchHeartRate() {
                 if (heartRate && heartRate !== "N/D" && heartRate !== "0") {
                     text.textContent = `${heartRate}`;
                     heart.style.backgroundImage = "url('/static/img/heart.png')";
+
+                    heart.style.animationName = "heartBeat"; 
                     
-                    //let newDuration = 60 / heartRate * 1000; 
-                    //heart._animation.effect.updateTiming({ duration: newDuration });
-                    //heart._animation.play();
                 } else {
                     text.textContent = "";
                     heart.style.backgroundImage = "url('/static/img/heart2.png')";
-                    //heart._animation.pause();
+                    heart.style.animationName = "none";
                 }
             }
         });
@@ -56,18 +63,7 @@ async function fetchHeartRate() {
         console.error("Fetch error:", error);
     }
 }
-/*
-const keyframes = [
-  { transform: 'scale(1)' },   
-  { transform: 'scale(1.1)' }   
-];
 
-let options = {
-  duration: "0.1s",
-  easing: 'ease-in-out',
-  fill: 'forwards'
-};
-*/
 document.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchHeartRate, 1000);
     fetchHeartRate();
