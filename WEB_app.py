@@ -40,4 +40,5 @@ def get_data():
         return {"error": "Data not available"}
 
 if __name__ == "__main__":
-    app.run(host="192.168.10.34", port="8080")
+    #app.run(host="192.168.10.71", port="8080")
+    app.run()

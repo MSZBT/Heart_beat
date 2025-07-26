@@ -1,8 +1,22 @@
-form {
+.forms  {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+form .names_direction {
+    display: flex;
+    flex-direction: column;
+}
+
+form .names_direction input {
+    margin-bottom: 10px;
+    max-width: 150px;
+}
+
+.names_direction div {
+    margin-bottom: 10px;
 }
 
 label {
@@ -21,7 +35,23 @@ button {
     width: 150px;
     height: 40px;
     font-size: 16px;
-    background-color: brown;
+    background-color: rgb(173, 173, 173);
+    color: white;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+.active {
+    background-color: brown !important;
+}
+
+.submit_names {
+    width: 120px;
+    height: 30px;
+    font-size: 16px;
+    background-color: rgb(37, 47, 187);
     color: white;
 }
 

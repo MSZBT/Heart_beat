@@ -43,7 +43,7 @@ body {
     width: 180px;
     height: 28px;
 
-    background-color: rgba(124, 124, 124, 0.32);
+    background-color: rgba(74, 74, 74, 0.32);
     display: flex;
     justify-content: space-between;
     align-items: center;
