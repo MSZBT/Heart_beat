@@ -111,80 +111,6 @@ async def monitor_devices():
             print(f"Monitoring error: {e}")
         
         await asyncio.sleep(5)
-'''
-async def print_status():
-    while True:
-        async with print_lock:
-            # Основная таблица с устройствами
-            output = []
-            output.append("\n" + "="*69)
-            output.append("HEART RATE MONITORING SYSTEM".center(69))
-            output.append("="*69)
-            output.append('%-5s | %-10s | %-20s | %-10s | %-10s' % 
-                        ('OWNER', 'NAME', 'ADDRESS', 'BPM', 'STATUS'))
-            output.append("-"*69)
-            
-            connected_count = 0
-            disconnected_devices = []
-            
-            for owner in DICTOWNERS:
-                device = DICTOWNERS[owner][1]
-                if device:
-                    status = "CONNECTED" if device.status else "DISCONNECTED"
-                    if device.status:
-                        connected_count += 1
-                    else:
-                        disconnected_devices.append(device.name)
-                    
-                    output.append('%-5s | %-10s | %-20s | %-10s | %-10s' % 
-                                (owner, 
-                                 device.name, 
-                                 device.address, 
-                                 device.heart_rate if device.heart_rate != "N/D" else "N/A", 
-                                 status))
-            
-            output.append("-"*69)
-            output.append(f"TOTAL DEVICES: {len(DICTOWNERS)} | CONNECTED: {connected_count} | DISCONNECTED: {len(DICTOWNERS)-connected_count}")
-            output.append("="*69)
-            
-            # Секция уведомлений
-            notifications = []
-            for owner in DICTOWNERS:
-                device = DICTOWNERS[owner][1]
-                if device and device.status and device.heart_rate not in ["N/D", 0]:
-                    notifications.append(f"[ACTIVE] {device.name}: {device.heart_rate} BPM")
-                elif device and not device.status:
-                    notifications.append(f"[ALERT] {device.name} disconnected")
-            
-            if notifications:
-                output.append("\nNOTIFICATIONS:")
-                output.append("-"*69)
-                output.extend(notifications)
-                output.append("-"*69)
-            
-            # Секция tracking/untracking устройств (если нужно оставить)
-            output.append("\nDEVICE TRACKING STATUS:")
-            output.append("-"*69)
-            output.append("CONNECTED DEVICES:")
-            for owner in DICTOWNERS:
-                device = DICTOWNERS[owner][1]
-                if device and device.status:
-                    output.append(f"- {device.name} ({device.address})")
-            
-            output.append("\nDISCONNECTED DEVICES:")
-            for owner in DICTOWNERS:
-                device = DICTOWNERS[owner][1]
-                if device and not device.status:
-                    output.append(f"- {device.name} ({device.address})")
-            
-            output.append("="*69)
-            
-            # Выводим весь собранный вывод
-            print("\n".join(output))
-        
-        await asyncio.sleep(1)
-
-'''
 
 async def print_status(): 
     TRANSMIT_DATA = {
@@ -203,7 +129,6 @@ async def print_status():
             else:
                 TRANSMIT_DATA[key] = "N/D"
         
-        # Запись в файл
         with open("TRANSMIT.json", "w") as f:
             json.dump(TRANSMIT_DATA, f)
             
