@@ -1,10 +1,47 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const submitButtons = document.querySelectorAll('.submit');
     const submitButtonNames = document.querySelector('.submit_names');
     const indikator = document.querySelector('.indikator');
     const formsFetchs = document.querySelectorAll('.forms form');
 
     let formDataNames;
+
+    function setupSubmitButtons() {
+        const submitButtons = document.querySelectorAll('.submit');
+        
+        submitButtons.forEach(function(submitButton) {
+            submitButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+                submitButtons.forEach(function(btn) {
+                    btn.classList.remove('active');
+                });
+
+                e.target.classList.add('active');
+
+                let selects = e.target.parentElement.querySelectorAll('.dirrection');
+                
+                const order = {};
+
+                selects.forEach((select, index) => {
+                    order[index + 1] = select.value;
+                });
+
+                console.log(order);
+                
+                try {
+                    const response = await fetch('/update_order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(order)
+                    });
+                    console.log("Порядок обновлен:", await response.json());
+                } catch (error) {
+                    console.error("Ошибка:", error);
+                }
+            });
+        });
+    }
+
+    setupSubmitButtons();
 
     submitButtonNames.addEventListener('click', function(event) {
         event.preventDefault(); 
@@ -45,43 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
             strFormFetch +='<button class="submit">Submit</button>';
 
             form.innerHTML = strFormFetch;
-        })
-    });
-
-    
-    submitButtons.forEach(function(submitButton) {
-
-        submitButton.addEventListener('click', async (e) => {
-
-            submitButtons.forEach(function(btn) {
-                btn.classList.remove('active');
-            });
-
-            e.target.classList.add('active');
-
-            let selects = e.target.parentElement.querySelectorAll('.dirrection');
-            
-            e.preventDefault();
-            const order = {};
-
-            selects.forEach((select, index) => {
-                order[index + 1] = select.value;
-            });
-
-            console.log(order);
-            
-            try {
-                const response = await fetch('/update_order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(order)
-                });
-                console.log("Порядок обновлен:", await response.json());
-            } catch (error) {
-                console.error("Ошибка:", error);
-            }
         });
-
-    })
-    
+        setupSubmitButtons();
+    });
 });
